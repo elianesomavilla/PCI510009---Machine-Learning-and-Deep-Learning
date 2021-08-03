@@ -1,0 +1,783 @@
+# **Carregamento e Análise dos Dados**
+
+#carregamento de dados 
+
+import pandas as pd
+
+df = pd.read_csv('/content/drive/My Drive/Exercicios aula PGCIN/Trabalho final/heart_dataset.csv',encoding='UTF-8', sep=',')
+df.head()
+
+#- idade: idade do paciente (anos)
+#- anemia: diminuição dos glóbulos vermelhos ou hemoglobina (booleana)
+#- pressão alta: se o paciente tem hipertensão (booleana)
+#- creatinina fosfoquinase (CPK): nível da enzima CPK no sangue (mcg / L)
+#- diabetes: se o paciente tem diabetes (booleano)
+#- fração de ejeção: porcentagem de sangue que sai do coração a cada contração (porcentagem)
+#- plaquetas: plaquetas no sangue (quiloplacas / mL)
+#- sexo: mulher ou homem (binário)
+#- creatinina sérica: nível de creatinina sérica no sangue (mg / dL)
+#- sódio sérico: nível de sódio sérico no sangue (mEq / L)
+#- tabagismo: se o paciente fuma ou não (booleano)
+#- tempo: período de acompanhamento (dias)
+#- evento de óbito [alvo]: se o paciente faleceu durante o período de acompanhamento (booleano)
+
+df.shape
+
+#tipos de dados 
+df.dtypes
+
+#mediana de idade
+age = df['age'].median() 
+print(age) 
+# mínima de idade
+min = df['age'].min() 
+print(min) 
+# máxima de idade
+max = df['age'].max() 
+print(max) 
+
+#quantos pacientes com idade superior a 60 que morreram
+df.query('age >=60  & DEATH_EVENT ==1').count()
+
+#quantos pacientes com idade inferior a 60 que morreram
+df.query('age < 60  & DEATH_EVENT ==1').count()
+
+#média de tempo de acompanhamento
+time = df['time'].mean() 
+print(time) 
+# mínima de tempo de acompanhamento
+mintemp = df['time'].min() 
+print(mintemp) 
+# máxima de tempo de acompanhamento
+maxtemp = df['time'].max() 
+print(maxtemp) 
+
+#analise de genero: 194 homens e 105 mulheres
+genero = df['sex'].value_counts() 
+print(genero) 
+
+#analise de fumantes = 96 fumantes
+fumar = df['smoking'].value_counts() 
+print(fumar) 
+
+#quantos pacientes que fumavam e morreram
+df.query('smoking==1  & DEATH_EVENT ==1').count()
+
+#analise de pressão alta = 105 com pressão alta
+pressao = df['high_blood_pressure'].value_counts() 
+print(pressao) 
+
+#quantos pacientes com pressão alta que morreram
+df.query('high_blood_pressure==1  & DEATH_EVENT ==1').count()
+
+#analise de ótibos: 96 pacientes faleceram
+obito = df['DEATH_EVENT'].value_counts() 
+print(obito) 
+
+#mediana de tempo de acompanhamento
+crea = df['serum_creatinine'].median() 
+print(crea) 
+# mínima de tempo de acompanhamento
+mincrea = df['serum_creatinine'].min() 
+print(mincrea) 
+# máxima de tempo de acompanhamento
+maxcrea = df['serum_creatinine'].max() 
+print(maxcrea) 
+#casos com cratinina acima de 1.5
+df1= df[df.serum_creatinine > 1.5]
+teste = df1['serum_creatinine'].count() 
+print(teste)
+
+#quantos pacientes com idade superior a 60 que  morreram
+df.query('serum_creatinine>1.5  & DEATH_EVENT ==1').count()
+
+
+# conjunto de dados com creatina > 1.5
+df1
+
+#quantos pacientes tinham anemia
+df.query('anaemia ==1 ').count()
+
+#quantos pacientes tinham anemia e morreram
+df.query('anaemia ==1 & DEATH_EVENT ==1').count()
+
+#quantos pacientes com diabetes
+df.query('diabetes ==1 ').count()
+
+#quantos pacientes com diabetes e morreram
+df.query('diabetes ==1 & DEATH_EVENT ==1').count()
+
+#analise de pacientes com fração de ejeção do ventriculo esquerdo menor ou igual 
+df.query('ejection_fraction <= 40 ').count()
+
+#analise de pacientes com fração de ejeção do ventriculo esquerdo menor ou igual a 40 que morreram
+df.query('ejection_fraction <= 40  & DEATH_EVENT ==1').count()
+
+
+#analise de pacientes com fração de ejeção do ventriculo esquerdo  menor ou igual a 40, idade  igual ou superior a 60 anos e com creatina maior que 1.5 que morreram
+df.query('ejection_fraction <= 40  & serum_creatinine>1.5 & age>=60 & DEATH_EVENT ==1').count()
+
+#média de plaquetas
+plaquetas = df['platelets'].mean() 
+print(plaquetas) 
+# mínima de plaquetas
+minplac = df['platelets'].min() 
+print(minplac) 
+# máxima de plaquetas
+maxplac = df['platelets'].max() 
+print(maxplac) 
+
+
+#média de sódio
+sodio = df['serum_sodium'].mean() 
+print(sodio) 
+# mínima de sódio
+minsodio = df['serum_sodium'].min() 
+print(minsodio) 
+# máxima de sódio
+maxsodio = df['serum_sodium'].max() 
+print(maxsodio) 
+
+#quantos pacientes com sódio em niveis baixos morreram
+df.query('serum_sodium < 136  & DEATH_EVENT ==1 ').count()
+
+#quantos pacientes com sódio em niveis altos
+#df.query('serum_sodium >= 136 & DEATH_EVENT ==1 ').count()
+
+
+#quantos pacientes com plaquetas em niveis normais morreram
+#df.query('platelets >= 150000  & platelets <=400000 & DEATH_EVENT ==1').count()
+
+#quantos pacientes com plaquetas em niveis altos morreram
+df.query('platelets > 400000  & DEATH_EVENT ==1').count()
+
+#quantos pacientes com plaquetas em niveis baixos morreram
+#df.query('platelets < 150000  & DEATH_EVENT ==1').count()
+
+#função para classificar as plaquetas entre valores menores que 150.000, entre 150.000 e 400.000 e maiores que 400.000
+def subistituir(item):
+    if(item < 150000):
+    	return 1
+    if(item <= 400000):
+    	return 2 
+    return 3
+df['platelets']=df['platelets'].map(subistituir)
+df
+
+df.query('platelets ==3 ').count()
+
+
+#média de creatinine_phosphokinase
+cpk = df['creatinine_phosphokinase'].mean() 
+print(cpk) 
+# mínima de creatinine_phosphokinase
+mincpk = df['creatinine_phosphokinase'].min() 
+print(mincpk) 
+# máxima de creatinine_phosphokinase
+maxcpk= df['creatinine_phosphokinase'].max() 
+print(maxcpk) 
+
+#quantos pacientes  Homens com creatinine_phosphokinase em niveis altos morreram
+#df.query('creatinine_phosphokinase >= 32 & creatinine_phosphokinase <= 294 & sex == 1   ').count()
+df.query('  creatinine_phosphokinase > 294 & sex == 1   ').count()
+
+#quantos pacientes  Mulheres com creatinine_phosphokinase em niveis altos morreram
+#df.query('creatinine_phosphokinase >=33 & creatinine_phosphokinase <= 211  & sex == 0  ').count()
+#df.query('creatinine_phosphokinase > 211  & sex == 0  ').count()
+
+# **Conjuntos X e y**
+
+#váriáveis dependentes sem o tempo de acompanhamento e o genero dos pacientes
+
+X1 = df.iloc[:,0:9]
+X2 = df.iloc[:,10:11]
+X = pd.concat([X1,X2],axis=1)
+X
+
+#váriáveis independentes
+
+y = df.iloc[:,12:13]
+y.head(1)
+
+# **Analisando as melhores features (variáveis independentes) e Realizando Pré - processamento**
+
+#verificar as  variáveis mais importantes considerando X e y
+
+#O Scikit-learn fornece a função SelectkBest() que pode ser usada para selecionar as melhores variáveis de um conjunto de dados. Informamos para o parâmetro k o número de recursos a serem selecionados como os mais importantes.
+from sklearn.feature_selection import SelectKBest
+#avaliação das melhores features
+classif = SelectKBest( k=10)
+fit = classif.fit(X,y)
+features = fit.transform(X)
+# Visualizando os indices das features (variáveis independentes) mais importantes
+cols = fit.get_support(indices=True)
+df.iloc[:,cols]
+
+
+#váriáveis dependentes sem o tempo de acompanhamento e o genero dos pacientes
+
+X1 = df.iloc[:,0:9]
+X2 = df.iloc[:,10:11]
+X = pd.concat([X1,X2],axis=1)
+X
+
+#váriáveis independentes
+
+y = df.iloc[:,12:13]
+y.head(1)
+
+
+#api model_selection  do sklearn faz a separação dos dados de treino e de teste
+from sklearn.model_selection import train_test_split
+#os dois primeiros parametros referem ao conjunto de variaveis independentes, variaveis  dependentes, o tamanho do conjunto de teste (comum 20% ou seja, 0.2) e o random_state refere-se a iniciação dos theta0 e theta1 (comum iniciar com zero)
+#.values transforma os dados em um array/matriz (outro objeto). As APIS que implementam as equações trabalham apenas com objetos arrays/matriz
+X_treino, X_teste, y_treino, y_teste = train_test_split(X.values,y.values, test_size=0.2, random_state = 0)
+
+#shape para ver o formato do X do y e o formato total da amostra
+X_treino.shape,X_teste.shape,y_treino.shape,y_teste.shape,X.shape
+
+#normalizar as variaveis para  escalar e aproximar os valores  do conjunto X
+from sklearn.preprocessing import StandardScaler
+sc = StandardScaler()
+X_train = sc.fit_transform(X_treino)
+X_test = sc.transform(X_teste)
+X_test
+
+# NÃO UTILIZADA A NORMALIZAÇÃO DE VALIÁVEIS PARA ESCALAR E APROXIMAR OS VALORES DE Y
+'''#normalizar as variaveis para  escalar e aproximar os valores do conjunto y
+from sklearn.preprocessing import StandardScaler
+sc = StandardScaler()
+y_train = sc.fit_transform(y_treino)
+y_test = sc.transform(y_teste)
+y_test'''
+
+# **KNN**
+
+# treinando o modelo 
+from sklearn.neighbors import KNeighborsClassifier
+# melhor resultado obtido foi através da análise dos 6 vizinhos mais próximos
+modelo_knn = KNeighborsClassifier(n_neighbors = 6)
+modelo_knn.fit(X_train,y_treino)
+#predição com a o X_test
+y_pred_knn = modelo_knn.predict(X_test)
+
+## **Analisando as melhores features (variáveis independentes) - KNN**
+
+from sklearn.neighbors import KNeighborsClassifier
+#SFS removem ou adicionam um recurso por vez com base no desempenho do classificador até que um subconjunto de recursos do tamanho k desejado seja alcançado
+from mlxtend.feature_selection import SequentialFeatureSelector as SFS
+# Ao escolher cv=0, não executamos nenhuma validação cruzada.
+#avaliação das melhores feactures
+sfs1 = SFS(modelo_knn, 
+           k_features=10, 
+           cv=0)
+
+sfs1 = sfs1.fit(X_train, y_treino)
+
+
+#nomeando as feactures do KNN
+feature_names = X.columns
+sfs1 = sfs1.fit(X_train, y_treino, custom_feature_names=feature_names)
+#Por meio do subsets_atributo, podemos dar uma olhada nos índices de recursos selecionados em cada etapa
+# sfs1.subsets_
+
+# IDs das melhores feactures 
+sfs1.k_feature_idx_
+
+# Nomes  das melhores feactures 
+sfs1.k_feature_names_
+
+## **Treinando  e avaliando novamente o modelo após avaliação de features**
+
+#excluindo variaveis de menor importancia
+
+X1 = df.iloc[:,0:9]
+X2 = df.iloc[:,10:11]
+X = pd.concat([X1,X2],axis=1)
+X
+
+#váriáveis independentes
+
+y = df.iloc[:,12:13]
+y.head(1)
+
+#api model_selection  do sklearn faz a separação dos dados de treino e de teste
+from sklearn.model_selection import train_test_split
+#os dois primeiros parametros referem ao conjunto de variaveis independentes, variaveis  dependentes, o tamanho do conjunto de teste (comum 20% ou seja, 0.2) e o random_state refere-se a iniciação dos theta0 e theta1 (comum iniciar com zero)
+#.values transforma os dados em um array/matriz (outro objeto). As APIS que implementam as equações trabalham apenas com objetos arrays/matriz
+X_treino, X_teste, y_treino, y_teste = train_test_split(X.values,y.values, test_size=0.2, random_state = 0)
+
+#shape para ver o formato do X do y e o formato total da amostra
+X_treino.shape,X_teste.shape,y_treino.shape,y_teste.shape,X.shape
+
+#normalizar as variaveis para  escalar e aproximar os valores  do conjunto X
+from sklearn.preprocessing import StandardScaler
+sc = StandardScaler()
+X_train = sc.fit_transform(X_treino)
+X_test = sc.transform(X_teste)
+X_test
+
+# treinando o modelo 
+from sklearn.neighbors import KNeighborsClassifier
+# melhor resultado obtido foi através da análise dos 6 vizinhos mais próximos
+modelo_knn = KNeighborsClassifier(n_neighbors = 6)
+modelo_knn.fit(X_train,y_treino)
+#predição com a o X_test
+y_pred_knn = modelo_knn.predict(X_test)
+
+#Matriz de confusão contabiliza se o valor previsto bateu com o valor real (verdadeiro positivo/verdadeiro negativo e falso positivo/falso negativo)
+from sklearn.metrics import confusion_matrix
+
+cm_knn = confusion_matrix(y_teste,y_pred_knn)
+
+#calculo da acurácia usando matriz de confusão - KNN
+acc_knn = (cm_knn[0,0]+cm_knn[1,1])/cm_knn.sum()
+cm_knn
+print('Knn: ', acc_knn)
+
+# **SVM**
+
+# treinando o modelo 
+from sklearn.svm import SVC
+# O kernel ajuda a achar a melhor decision boundery
+#rbf é um kernel linear , ou seja, tenta seguir uma distribuição normal dos dados.  mas existem outros kelnels que podem ser usadas qdo o, por exemplo, nao existe uma distribuição normal de dados e pode ser usado  polimonio
+#para este modelo o melhor resultado obtido foi através do uso do kernel linear
+modelo_svm = SVC(kernel='linear', random_state = 0)
+modelo_svm.fit(X_train,y_treino)
+#predição com a o X_test
+y_pred_svm = modelo_svm.predict(X_test)
+
+## **Analisando as melhores features (variáveis independentes) - SVM**
+
+from sklearn.svm import SVC
+#Dado um estimador externo que atribui pesos aos recursos (por exemplo, os coeficientes de um modelo linear), o objetivo da eliminação recursiva de recursos ( RFE) é selecionar recursos considerando recursivamente conjuntos cada vez menores de recursos.
+#  Em seguida, os recursos menos importantes são removidos do conjunto atual de recursos. 
+from sklearn.feature_selection import RFE
+
+svc = SVC(kernel="linear", C=1)
+#verifica as  melhores features
+rfe = RFE(estimator=svc, n_features_to_select=10)
+rfe = rfe.fit(X_train, y_treino)
+#imprime o ID das variáveis ranqueadas (mais importantes)
+print(rfe.ranking_)
+print(rfe.support_)
+
+# Visualizando os indices das features (variáveis independentes) mais importantes
+cols = rfe.get_support(indices=True)
+df.iloc[:,cols]
+
+## **Treinando e avaliando novamente o modelo após avaliação de features**
+
+#váriáveis dependentes sem o tempo de acompanhamento e o genero dos pacientes
+
+X1 = df.iloc[:,0:9]
+X2 = df.iloc[:,10:11]
+X = pd.concat([X1,X2],axis=1)
+X
+
+
+#váriáveis independentes
+
+y = df.iloc[:,12:13]
+y.head(1)
+
+#api model_selection  do sklearn faz a separação dos dados de treino e de teste
+from sklearn.model_selection import train_test_split
+#os dois primeiros parametros referem ao conjunto de variaveis independentes, variaveis  dependentes, o tamanho do conjunto de teste (comum 20% ou seja, 0.2) e o random_state refere-se a iniciação dos theta0 e theta1 (comum iniciar com zero)
+#.values transforma os dados em um array/matriz (outro objeto). As APIS que implementam as equações trabalham apenas com objetos arrays/matriz
+X_treino, X_teste, y_treino, y_teste = train_test_split(X.values,y.values, test_size=0.2, random_state = 0)
+
+#shape para ver o formato do X do y e o formato total da amostra
+X_treino.shape,X_teste.shape,y_treino.shape,y_teste.shape,X.shape
+
+#normalizar as variaveis para  escalar e aproximar os valores  do conjunto X
+from sklearn.preprocessing import StandardScaler
+sc = StandardScaler()
+X_train = sc.fit_transform(X_treino)
+X_test = sc.transform(X_teste)
+#X_test
+
+# treinando o modelo 
+from sklearn.svm import SVC
+# O kernel ajuda a achar a melhor decision boundery
+#rbf é um kernel linear , ou seja, tenta seguir uma distribuição normal dos dados.  mas existem outros kelnels que podem ser usadas qdo o, por exemplo, nao existe uma distribuição normal de dados e pode ser usado  polimonio
+#para este modelo o melhor resultado obtido foi através do uso do kernel linear
+modelo_svm = SVC(kernel='linear', random_state = 0)
+modelo_svm.fit(X_train,y_treino)
+#predição com a o X_test
+y_pred_svm = modelo_svm.predict(X_test)
+
+#Matriz de confusão contabiliza se o valor previsto bateu com o valor real (verdadeiro positivo/verdadeiro negativo e falso positivo/falso negativo)
+from sklearn.metrics import confusion_matrix
+
+cm_svm = confusion_matrix(y_teste,y_pred_svm)
+
+#calculo da acurácia usando matriz de confusão - SVM
+acc_svm = (cm_svm[0,0]+cm_svm[1,1])/cm_svm.sum()
+cm_svm
+print('SVM: ', acc_svm)
+
+# **Random Forest Classifier**
+
+# treinando o modelo 
+from sklearn.ensemble import RandomForestClassifier
+# 7 arvores foi o melhor parâmetro para usalizar no RFC
+modelo_rf = RandomForestClassifier(n_estimators = 7, random_state = 0)
+modelo_rf.fit(X_train,y_treino)
+#predição com a o X_test
+y_pred_rf = modelo_rf.predict(X_test)
+
+## **Analisando as melhores features (variáveis independentes) - RFC**
+
+# Métodos  assembly podem ser usados para estimar a importância de cada atributo. Ele retorna um score para cada atributo, quanto maior o score, maior é a importância desse atributo.
+modelo_rf.feature_importances_
+
+#Criando um Dataframe com as colunas e seus scores
+feature_importances = pd.DataFrame(modelo_rf.feature_importances_, index = X.columns,
+                                    columns=['importance']).sort_values('importance',   ascending=False)
+
+feature_importances 
+
+# Visualizando as importâncias de forma gráfica
+feature_importances.plot(kind='bar')
+
+# outra forma gráfica  com a biblioteca seaborn
+
+import seaborn as sns
+
+importances = pd.Series(data=modelo_rf.feature_importances_, index = X.columns)
+sns.barplot(x=importances, y=importances.index, orient='h').set_title('Importância de cada feature')
+
+
+
+## **Treinando e avaliando novamente o modelo após avaliação de features**
+
+#váriáveis dependentes sem o tempo de acompanhamento e o genero dos pacientes
+
+X1 = df.iloc[:,0:9]
+X2 = df.iloc[:,10:11]
+X = pd.concat([X1,X2],axis=1)
+X
+
+#váriáveis independentes
+
+y = df.iloc[:,12:13]
+y.head(1)
+
+#api model_selection  do sklearn faz a separação dos dados de treino e de teste
+from sklearn.model_selection import train_test_split
+#os dois primeiros parametros referem ao conjunto de variaveis independentes, variaveis  dependentes, o tamanho do conjunto de teste (comum 20% ou seja, 0.2) e o random_state refere-se a iniciação dos theta0 e theta1 (comum iniciar com zero)
+#.values transforma os dados em um array/matriz (outro objeto). As APIS que implementam as equações trabalham apenas com objetos arrays/matriz
+X_treino, X_teste, y_treino, y_teste = train_test_split(X.values,y.values, test_size=0.2, random_state = 0)
+
+#shape para ver o formato do X do y e o formato total da amostra
+X_treino.shape,X_teste.shape,y_treino.shape,y_teste.shape,X.shape
+
+#normalizar as variaveis para  escalar e aproximar os valores  do conjunto X
+from sklearn.preprocessing import StandardScaler
+sc = StandardScaler()
+X_train = sc.fit_transform(X_treino)
+X_test = sc.transform(X_teste)
+#X_test
+
+# treinando o modelo 
+from sklearn.ensemble import RandomForestClassifier
+# 7 arvores foi o melhor parâmetro para usalizar no RFC
+modelo_rf = RandomForestClassifier(n_estimators = 7, random_state = 0)
+modelo_rf.fit(X_train,y_treino)
+#predição com a o X_test
+y_pred_rf = modelo_rf.predict(X_test)
+
+#Matriz de confusão contabiliza se o valor previsto bateu com o valor real (verdadeiro positivo/verdadeiro negativo e falso positivo/falso negativo)
+from sklearn.metrics import confusion_matrix
+
+cm_rf = confusion_matrix(y_teste,y_pred_rf)
+
+#calculo da acurácia usando matriz de confusão - RFC
+acc_rf = (cm_rf[0,0]+cm_rf[1,1])/cm_rf.sum()
+cm_rf
+print('RFC: ', acc_rf)
+
+
+
+# **Logistic Regression**
+
+# treinando o modelo 
+from sklearn.linear_model import LogisticRegression
+modelo_log = LogisticRegression(random_state = 0)
+modelo_log.fit(X_train,y_treino)
+#predição com a o X_test
+y_pred_log = modelo_log.predict(X_test)
+
+## **Analisando as melhores features (variáveis independentes) - Logist. Regres.**
+
+from sklearn.linear_model import LogisticRegression
+modelo_log  = LogisticRegression()
+#Remove recursivamente os atributos e constrói o modelo com os atributos remanescentes
+from sklearn.feature_selection import RFE
+
+#avaliação das melhores features
+rfe = RFE(modelo_log, 10)
+fit = rfe.fit(X_train, y_treino)
+
+# Mostrando o número de features:
+print ("Número de features: {}".format(fit.n_features_))  
+
+
+# Visualizando os indices das features (variáveis independentes) mais importantes
+cols = fit.get_support(indices=True)
+df.iloc[:,cols]
+
+
+## **Treinando e avaliando novamente o modelo após avaliação de features**
+
+#váriáveis dependentes sem o tempo de acompanhamento e o genero dos pacientes
+
+X1 = df.iloc[:,0:9]
+X2 = df.iloc[:,10:11]
+X = pd.concat([X1,X2],axis=1)
+X
+
+#váriáveis independentes
+
+y = df.iloc[:,12:13]
+y.head(1)
+
+#api model_selection  do sklearn faz a separação dos dados de treino e de teste
+from sklearn.model_selection import train_test_split
+#os dois primeiros parametros referem ao conjunto de variaveis independentes, variaveis  dependentes, o tamanho do conjunto de teste (comum 20% ou seja, 0.2) e o random_state refere-se a iniciação dos theta0 e theta1 (comum iniciar com zero)
+#.values transforma os dados em um array/matriz (outro objeto). As APIS que implementam as equações trabalham apenas com objetos arrays/matriz
+X_treino, X_teste, y_treino, y_teste = train_test_split(X.values,y.values, test_size=0.2, random_state = 0)
+
+#shape para ver o formato do X do y e o formato total da amostra
+X_treino.shape,X_teste.shape,y_treino.shape,y_teste.shape,X.shape
+
+#normalizar as variaveis para  escalar e aproximar os valores  do conjunto X
+from sklearn.preprocessing import StandardScaler
+sc = StandardScaler()
+X_train = sc.fit_transform(X_treino)
+X_test = sc.transform(X_teste)
+#X_test
+
+# treinando o modelo 
+from sklearn.linear_model import LogisticRegression
+modelo_log = LogisticRegression(random_state = 0)
+modelo_log.fit(X_train,y_treino)
+#predição com a o X_test
+y_pred_log = modelo_log.predict(X_test)
+
+#Matriz de confusão contabiliza se o valor previsto bateu com o valor real (verdadeiro positivo/verdadeiro negativo e falso positivo/falso negativo)
+from sklearn.metrics import confusion_matrix
+
+cm_log = confusion_matrix(y_teste,y_pred_log)
+
+#calculo da acurácia usando matriz de confusão - LOG
+acc_log = (cm_log[0,0]+cm_log[1,1])/cm_log.sum()
+cm_log
+print('log: ', acc_log)
+
+# **Regressão Linear Multivariada**
+
+#a api linear_model do sklearn faz o treinamento, o LinearRegression faz o treinamento de forma linear. Pra ele nao importa se é uma ou N variaveis, entao dá pra usar na regressão multivariada
+from sklearn.linear_model import LinearRegression
+
+modelo_mult = LinearRegression()
+#passa o conjunto de treinamento para o objeto 'modelo' e realiza o treinamento
+modelo_mult.fit(X_train,y_treino)
+y_pred_multvar = modelo_mult.predict(X_test)
+
+
+#para medir a acurácia usar a api metrics, especificamente a função r2_score
+from sklearn.metrics import r2_score
+#acurácia do conjunto de teste
+r2_score(y_teste,y_pred_multvar)
+
+## **Analisando as melhores features (variáveis independentes) - Regres. Linear Multi.**
+
+from sklearn.linear_model import LinearRegression
+
+modelo_mult = LinearRegression()
+#Remove recursivamente os atributos e constrói o modelo com os atributos remanescentes
+from sklearn.feature_selection import RFE
+
+#avaliação das melhores features
+rfe = RFE(modelo_mult, 10)
+fit = rfe.fit(X_train, y_treino)
+
+# Mostrando o número de features:
+print ("Número de features: {}".format(fit.n_features_))  
+
+# Visualizando os indices das features (variáveis independentes) mais importantes
+cols = fit.get_support(indices=True)
+df.iloc[:,cols]
+
+## **Treinando e avaliando novamente o modelo após avaliação de features**
+
+#váriáveis dependentes sem o tempo de acompanhamento e o genero dos pacientes
+
+X1 = df.iloc[:,0:9]
+X2 = df.iloc[:,10:11]
+X = pd.concat([X1,X2],axis=1)
+X
+
+#váriáveis independentes
+
+y = df.iloc[:,12:13]
+y.head(1)
+
+#api model_selection  do sklearn faz a separação dos dados de treino e de teste
+from sklearn.model_selection import train_test_split
+#os dois primeiros parametros referem ao conjunto de variaveis independentes, variaveis  dependentes, o tamanho do conjunto de teste (comum 20% ou seja, 0.2) e o random_state refere-se a iniciação dos theta0 e theta1 (comum iniciar com zero)
+#.values transforma os dados em um array/matriz (outro objeto). As APIS que implementam as equações trabalham apenas com objetos arrays/matriz
+X_treino, X_teste, y_treino, y_teste = train_test_split(X.values,y.values, test_size=0.2, random_state = 0)
+
+#shape para ver o formato do X do y e o formato total da amostra
+X_treino.shape,X_teste.shape,y_treino.shape,y_teste.shape,X.shape
+
+#normalizar as variaveis para  escalar e aproximar os valores  do conjunto X
+from sklearn.preprocessing import StandardScaler
+sc = StandardScaler()
+X_train = sc.fit_transform(X_treino)
+X_test = sc.transform(X_teste)
+#X_test
+
+#a api linear_model do sklearn faz o treinamento, o LinearRegression faz o treinamento de forma linear. Pra ele nao importa se é uma ou N variaveis, entao dá pra usar na regressão multivariada
+from sklearn.linear_model import LinearRegression
+
+modelo_mult = LinearRegression()
+#passa o conjunto de treinamento para o objeto 'modelo' e realiza o treinamento
+modelo_mult.fit(X_train,y_treino)
+y_pred_multvar = modelo_mult.predict(X_test)
+
+#para medir a acurácia usar a api metrics, especificamente a função r2_score
+from sklearn.metrics import r2_score
+#acurácia do conjunto de teste
+r2_score(y_teste,y_pred_multvar)
+
+
+# **Regressão Polinomial**
+
+# importando o PolynomialFeatures para elevar ao grau desejado 
+#operação executada apenass com X_treino
+from sklearn.preprocessing import PolynomialFeatures
+# conforme muda o degree, muda o grau do polinomio. O degree 3 foi o melhor resultado
+poly = PolynomialFeatures(degree=3)
+X_poly = poly.fit_transform(X_train)
+
+X_poly
+
+from sklearn.linear_model import LinearRegression
+
+modelo_pol = LinearRegression()
+modelo_pol.fit(X_poly,y_treino)
+y_pred = modelo_pol.predict(X_poly)
+y_pred
+
+
+#para medir a acurácia usar a api metrics, especificamente a função r2_score
+from sklearn.metrics import r2_score
+#acurácia do conjunto de teste
+r2_score(y_treino,y_pred)
+
+## **Analisando as melhores features (variáveis independentes) - Regressão Polinomial**
+
+from sklearn.linear_model import LinearRegression
+
+modelo_pol = LinearRegression()
+#Remove recursivamente os atributos e constrói o modelo com os atributos remanescentes
+from sklearn.feature_selection import RFE
+
+#avaliação das melhores features
+rfe = RFE(modelo_pol, 10)
+fit = rfe.fit(X_train, y_treino)
+
+# Mostrando o número de features:
+print ("Número de features: {}".format(fit.n_features_))  
+
+# Visualizando os indices das features (variáveis independentes) mais importantes
+cols = fit.get_support(indices=True)
+df.iloc[:,cols]
+
+
+## **Treinando e avaliando novamente o modelo após avaliação de features**
+
+#váriáveis dependentes sem o tempo de acompanhamento e o genero dos pacientes
+
+X1 = df.iloc[:,0:9]
+X2 = df.iloc[:,10:11]
+X = pd.concat([X1,X2],axis=1)
+X
+
+#váriáveis independentes
+
+y = df.iloc[:,12:13]
+y.head(1)
+
+#api model_selection  do sklearn faz a separação dos dados de treino e de teste
+from sklearn.model_selection import train_test_split
+#os dois primeiros parametros referem ao conjunto de variaveis independentes, variaveis  dependentes, o tamanho do conjunto de teste (comum 20% ou seja, 0.2) e o random_state refere-se a iniciação dos theta0 e theta1 (comum iniciar com zero)
+#.values transforma os dados em um array/matriz (outro objeto). As APIS que implementam as equações trabalham apenas com objetos arrays/matriz
+X_treino, X_teste, y_treino, y_teste = train_test_split(X.values,y.values, test_size=0.2, random_state = 0)
+
+#shape para ver o formato do X do y e o formato total da amostra
+X_treino.shape,X_teste.shape,y_treino.shape,y_teste.shape,X.shape
+
+#normalizar as variaveis para  escalar e aproximar os valores  do conjunto X
+from sklearn.preprocessing import StandardScaler
+sc = StandardScaler()
+X_train = sc.fit_transform(X_treino)
+X_test = sc.transform(X_teste)
+#X_test
+
+# importando o PolynomialFeatures para elevar ao grau desejado 
+#operação executada apenass com X_treino
+from sklearn.preprocessing import PolynomialFeatures
+# conforme muda o degree, muda o grau do polinomio. O degree 3 foi o melhor resultado
+poly = PolynomialFeatures(degree=3)
+X_poly = poly.fit_transform(X_train)
+
+from sklearn.linear_model import LinearRegression
+
+modelo_pol = LinearRegression()
+modelo_pol.fit(X_poly,y_treino)
+y_pred = modelo_pol.predict(X_poly)
+
+
+#para medir a acurácia usar a api metrics, especificamente a função r2_score
+from sklearn.metrics import r2_score
+#acurácia do conjunto de teste
+r2_score(y_treino,y_pred)
+
+# **Matriz de Confusão para avaliação classificatória**
+
+#Matriz de confusão contabiliza se o valor previsto bateu com o valor real (verdadeiro positivo/verdadeiro negativo e falso positivo/falso negativo)
+from sklearn.metrics import confusion_matrix
+
+cm_knn = confusion_matrix(y_teste,y_pred_knn)
+cm_svm = confusion_matrix(y_teste,y_pred_svm)
+cm_rf = confusion_matrix(y_teste,y_pred_rf)
+cm_log = confusion_matrix(y_teste,y_pred_log)
+
+
+#calculo da acurácia usando matriz de confusão - KNN
+acc_knn = (cm_knn[0,0]+cm_knn[1,1])/cm_knn.sum()
+cm_knn
+
+
+#calculo da acurácia usando matriz de confusão - SVM
+acc_svm = (cm_svm[0,0]+cm_svm[1,1])/cm_svm.sum()
+cm_svm
+
+#calculo da acurácia usando matriz de confusão - RFC
+acc_rf = (cm_rf[0,0]+cm_rf[1,1])/cm_rf.sum()
+cm_rf
+
+#calculo da acurácia usando matriz de confusão - Reg. Logistica
+acc_log = (cm_log[0,0]+cm_log[1,1])/cm_log.sum()
+cm_log
+
+# imprimindo a acurácia
+print('Knn: ', acc_knn)
+print('SVM: ', acc_svm)
+print('Random Fortest: ', acc_rf)
+print('Logistic Regression: ', acc_log)
